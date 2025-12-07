@@ -279,16 +279,16 @@ const App: React.FC = () => {
       )}
 
       {/* Main Game Area */}
-      <main className="flex-grow flex flex-col items-center justify-center w-full max-w-5xl">
+      <main className="flex-grow flex flex-col items-center w-full max-w-6xl">
         
         {/* Instruction Banner */}
-        <div className="mb-10 text-center min-h-[3rem]">
+        <div className="mb-6 md:mb-10 text-center min-h-[3rem]">
            {gameState === GameState.LOADING ? (
-             <div className="text-xl text-amber-300 animate-pulse">퍼즐을 생성하고 있습니다...</div>
+             <div className="text-lg md:text-xl text-amber-300 animate-pulse">퍼즐을 생성하고 있습니다...</div>
            ) : (
-             <div className={`text-xl font-medium px-8 py-3 rounded-full inline-block shadow-lg transition-all
+             <div className={`text-base md:text-xl font-medium px-4 md:px-8 py-2 md:py-3 rounded-full inline-block shadow-lg transition-all
                ${gameState === GameState.WON 
-                 ? 'bg-green-900/80 text-green-300 border border-green-600 scale-110' 
+                 ? 'bg-green-900/80 text-green-300 border border-green-600 scale-105 md:scale-110' 
                  : 'bg-gray-800/80 text-gray-200 border border-gray-600'}
              `}>
                {message}
@@ -296,56 +296,60 @@ const App: React.FC = () => {
            )}
         </div>
 
-        {/* The Board */}
-        <div className="w-full overflow-x-auto pb-8 flex justify-center">
-            <div className="flex items-center gap-2 md:gap-4 p-10 bg-[#2a2a2a] rounded-3xl border-4 border-[#3a3a3a] shadow-[0_10px_40px_rgba(0,0,0,0.5)] min-w-max relative">
-              {/* Board Texture Overlay */}
-              <div className="absolute inset-0 rounded-[1.3rem] opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')]"></div>
-              
-              {board.map((char, cIndex) => {
-                if (char.type === 'digit') {
-                  return (
-                    <Digit 
-                      key={char.id} 
-                      segments={char.activeSegments} 
-                      onToggle={(sIndex) => handleToggle(cIndex, sIndex)} 
-                    />
-                  );
-                } else {
-                  return (
-                    <Operator 
-                      key={char.id} 
-                      type={char.value as any} 
-                      activeSticks={char.activeSegments} 
-                      onToggle={(sIndex) => handleToggle(cIndex, sIndex)} 
-                    />
-                  );
-                }
-              })}
+        {/* The Board - Optimized for Mobile */}
+        {/* Wrapper to handle scaling centering */}
+        <div className="w-full flex justify-center overflow-x-auto overflow-y-hidden pb-8 no-scrollbar touch-pan-x">
+            {/* Scaling container: Scales down on small screens */}
+            <div className="transform origin-top scale-[0.55] sm:scale-[0.75] md:scale-100 transition-transform duration-300 ease-out">
+              <div className="flex items-center gap-1 md:gap-4 p-4 md:p-10 bg-[#2a2a2a] rounded-3xl border-4 border-[#3a3a3a] shadow-[0_10px_40px_rgba(0,0,0,0.5)] min-w-max relative">
+                {/* Board Texture Overlay */}
+                <div className="absolute inset-0 rounded-[1.3rem] opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')]"></div>
+                
+                {board.map((char, cIndex) => {
+                  if (char.type === 'digit') {
+                    return (
+                      <Digit 
+                        key={char.id} 
+                        segments={char.activeSegments} 
+                        onToggle={(sIndex) => handleToggle(cIndex, sIndex)} 
+                      />
+                    );
+                  } else {
+                    return (
+                      <Operator 
+                        key={char.id} 
+                        type={char.value as any} 
+                        activeSticks={char.activeSegments} 
+                        onToggle={(sIndex) => handleToggle(cIndex, sIndex)} 
+                      />
+                    );
+                  }
+                })}
+              </div>
             </div>
         </div>
 
-        {/* Controls */}
-        <div className="mt-12 flex flex-wrap justify-center gap-6">
+        {/* Controls - Adjusted margin top due to scale effect */}
+        <div className="mt-[-2rem] sm:mt-8 flex flex-wrap justify-center gap-4 md:gap-6 z-10">
             <button 
               onClick={requestHint}
               disabled={gameState !== GameState.PLAYING}
-              className="flex items-center gap-2 bg-indigo-900/50 hover:bg-indigo-800/70 text-indigo-200 border border-indigo-700 px-8 py-3 rounded-xl text-lg transition-all disabled:opacity-50 hover:shadow-[0_0_15px_rgba(99,102,241,0.3)]"
+              className="flex items-center gap-2 bg-indigo-900/50 hover:bg-indigo-800/70 text-indigo-200 border border-indigo-700 px-6 py-3 rounded-xl text-base md:text-lg transition-all disabled:opacity-50 hover:shadow-[0_0_15px_rgba(99,102,241,0.3)]"
             >
-              <Lightbulb size={24} /> 힌트 보기
+              <Lightbulb size={20} /> 힌트 보기
             </button>
 
             <button 
               onClick={checkSolution}
               disabled={gameState !== GameState.PLAYING}
-              className="flex items-center gap-2 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white px-10 py-3 rounded-xl text-lg font-bold shadow-[0_0_20px_rgba(245,158,11,0.4)] transition-all transform hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 disabled:shadow-none"
+              className="flex items-center gap-2 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white px-8 py-3 rounded-xl text-base md:text-lg font-bold shadow-[0_0_20px_rgba(245,158,11,0.4)] transition-all transform hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 disabled:shadow-none"
             >
-              <CheckCircle size={24} /> 정답 확인
+              <CheckCircle size={20} /> 정답 확인
             </button>
         </div>
 
         {/* Stats */}
-        <div className="mt-8 text-gray-500 text-sm font-mono bg-black/20 px-4 py-2 rounded-lg">
+        <div className="mt-6 md:mt-8 text-gray-500 text-sm font-mono bg-black/20 px-4 py-2 rounded-lg">
            남은 성냥개비: <span className={`text-lg ml-2 ${currentStickCount !== initialStickCount ? 'text-red-400 font-bold' : 'text-green-400 font-bold'}`}>{currentStickCount}</span> / {initialStickCount}
         </div>
 
@@ -354,7 +358,7 @@ const App: React.FC = () => {
       {/* Hint Modal */}
       {showHintModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-          <div className="bg-gray-900 border border-gray-600 p-8 rounded-2xl max-w-md w-full relative shadow-2xl">
+          <div className="bg-gray-900 border border-gray-600 p-6 md:p-8 rounded-2xl max-w-md w-full relative shadow-2xl">
             <h3 className="text-xl font-bold text-amber-400 mb-6 flex items-center gap-3 pb-4 border-b border-gray-800">
               <Lightbulb className="fill-amber-400 text-amber-400" size={24} /> 
               {apiError ? "기본 힌트" : "AI 힌트"}
