@@ -1,0 +1,21 @@
+{
+  "short_name": "성냥개비 퍼즐",
+  "name": "성냥개비 퍼즐 마스터",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/826/826963.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/826/826963.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#1a1a1a",
+  "background_color": "#1a1a1a",
+  "orientation": "portrait"
+}

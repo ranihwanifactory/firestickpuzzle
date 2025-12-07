@@ -1,3 +1,4 @@
+
 export type SegmentId = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 // 0: Top, 1: TopLeft, 2: TopRight, 3: Middle, 4: BottomLeft, 5: BottomRight, 6: Bottom
@@ -7,6 +8,7 @@ export interface PuzzleData {
   originalEquation: string; // e.g., "6+4=4"
   targetMoves: number;      // e.g., 1
   hint: string;
+  error?: string;           // Optional field to indicate API issues
 }
 
 export interface DigitState {

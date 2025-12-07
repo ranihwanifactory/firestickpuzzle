@@ -1,10 +1,12 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
 import { PuzzleData } from "../types";
 
-// Safety check for API Key
-const API_KEY = process.env.API_KEY || '';
+// The API key must be obtained exclusively from the environment variable process.env.API_KEY.
+const API_KEY = process.env.API_KEY;
 
-const ai = new GoogleGenAI({ apiKey: API_KEY });
+// Initialize AI client only if key exists, otherwise use a safe dummy to prevent immediate crash
+const ai = API_KEY ? new GoogleGenAI({ apiKey: API_KEY }) : null;
 
 const SYSTEM_PROMPT = `
 You are a matchstick puzzle generator. 
@@ -23,6 +25,8 @@ Return JSON format:
 
 export const fetchPuzzle = async (): Promise<PuzzleData> => {
   try {
+    if (!ai) throw new Error("API Key is missing in environment variables");
+
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: "Generate a new matchstick puzzle.",
@@ -45,19 +49,28 @@ export const fetchPuzzle = async (): Promise<PuzzleData> => {
     if (!text) throw new Error("No data returned");
     
     return JSON.parse(text) as PuzzleData;
-  } catch (error) {
-    console.error("Gemini API Error:", error);
-    // Fallback puzzle in case of API failure or missing key
+  } catch (error: any) {
+    console.warn("Gemini API Error, using fallback:", error);
+    
+    let errorMsg = "API Connection Failed";
+    if (!API_KEY) errorMsg = "API Key Not Found";
+    else if (error.message?.includes("403")) errorMsg = "API Key Permission Denied";
+    
+    // Return a playable fallback puzzle so the app doesn't break
+    // Alternating fallbacks could be added here for variety in demo mode
     return {
       originalEquation: "6+4=4",
       targetMoves: 1,
-      hint: "숫자 6을 주의 깊게 보세요. (API Error - Using Fallback)"
+      hint: "숫자 6을 0으로 바꿔보세요.",
+      error: errorMsg
     };
   }
 };
 
 export const getHintFromAI = async (currentEquation: string): Promise<string> => {
    try {
+    if (!ai) return "API 키가 설정되지 않아 AI 힌트를 사용할 수 없습니다.";
+
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: `Current state: ${currentEquation}. Give a small progressive hint without revealing the answer directly. Language: Korean.`,
@@ -66,7 +79,8 @@ export const getHintFromAI = async (currentEquation: string): Promise<string> =>
       }
     });
     return response.text || "힌트를 불러올 수 없습니다.";
-  } catch (error) {
-    return "API 연결을 확인해주세요.";
+  } catch (error: any) {
+    console.error("Hint API Error:", error);
+    return "AI 힌트 연결에 실패했습니다.";
   }
 }
