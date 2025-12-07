@@ -2,8 +2,22 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { PuzzleData } from "../types";
 
+// Declare process to satisfy TypeScript since we are using DefinePlugin in Vite
+declare const process: {
+  env: {
+    API_KEY: string | undefined;
+  }
+};
+
 // The API key must be obtained exclusively from the environment variable process.env.API_KEY.
 const API_KEY = process.env.API_KEY;
+
+// Debugging: Log status (don't log the full key for security)
+if (!API_KEY) {
+  console.warn("Gemini Service: API_KEY is missing/undefined in process.env");
+} else {
+  console.log(`Gemini Service: API_KEY found (Length: ${API_KEY.length}). Initializing AI...`);
+}
 
 // Initialize AI client only if key exists, otherwise use a safe dummy to prevent immediate crash
 const ai = API_KEY ? new GoogleGenAI({ apiKey: API_KEY }) : null;
@@ -25,7 +39,7 @@ Return JSON format:
 
 export const fetchPuzzle = async (): Promise<PuzzleData> => {
   try {
-    if (!ai) throw new Error("API Key is missing in environment variables");
+    if (!ai) throw new Error("API Key is missing from environment variables");
 
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
@@ -55,6 +69,7 @@ export const fetchPuzzle = async (): Promise<PuzzleData> => {
     let errorMsg = "API Connection Failed";
     if (!API_KEY) errorMsg = "API Key Not Found";
     else if (error.message?.includes("403")) errorMsg = "API Key Permission Denied";
+    else if (error.message) errorMsg = error.message;
     
     // Return a playable fallback puzzle so the app doesn't break
     // Alternating fallbacks could be added here for variety in demo mode

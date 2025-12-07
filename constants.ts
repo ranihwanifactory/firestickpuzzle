@@ -1,4 +1,3 @@
-import { SegmentId } from './types';
 
 // Map characters to their 7-segment representation (true = stick present)
 // 0: Top, 1: TopLeft, 2: TopRight, 3: Middle, 4: BottomLeft, 5: BottomRight, 6: Bottom

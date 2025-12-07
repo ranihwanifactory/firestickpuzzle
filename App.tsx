@@ -266,10 +266,14 @@ const App: React.FC = () => {
 
       {/* API Warning Banner */}
       {apiError && (
-        <div className="w-full max-w-2xl mb-6 bg-red-900/30 border border-red-800 text-red-200 px-4 py-3 rounded-lg flex items-center gap-3">
-          <AlertTriangle className="text-red-500 flex-shrink-0" size={20} />
+        <div className="w-full max-w-2xl mb-6 bg-red-900/30 border border-red-800 text-red-200 px-4 py-3 rounded-lg flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+          <AlertTriangle className="text-red-500 flex-shrink-0" size={24} />
           <div className="text-sm">
-            <span className="font-bold">API 연결 확인 필요:</span> {apiError}. 현재는 체험용 기본 퍼즐만 제공됩니다.
+            <p className="font-bold text-base mb-1">API 연결 오류: {apiError}</p>
+            <p className="text-red-300">
+              1. <code>.env</code> 파일에 <code>API_KEY</code>가 있는지 확인하세요.<br/>
+              2. 키를 새로 입력했다면 <span className="text-white font-bold underline decoration-red-500 decoration-2">반드시 터미널을 껐다가 다시 켜야 합니다 (npm run dev 재시작).</span>
+            </p>
           </div>
         </div>
       )}
